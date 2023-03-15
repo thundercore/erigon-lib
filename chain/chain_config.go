@@ -84,11 +84,12 @@ type Config struct {
 	Eip1559FeeCollectorTransition *big.Int        `json:"eip1559FeeCollectorTransition,omitempty"` // (Optional) Block from which burnt EIP-1559 fees go to the Eip1559FeeCollector
 
 	// Various consensus engines
-	Ethash *EthashConfig `json:"ethash,omitempty"`
-	Clique *CliqueConfig `json:"clique,omitempty"`
-	Aura   *AuRaConfig   `json:"aura,omitempty"`
-	Parlia *ParliaConfig `json:"parlia,omitempty" toml:",omitempty"`
-	Bor    *BorConfig    `json:"bor,omitempty"`
+	Ethash  *EthashConfig  `json:"ethash,omitempty"`
+	Clique  *CliqueConfig  `json:"clique,omitempty"`
+	Aura    *AuRaConfig    `json:"aura,omitempty"`
+	Parlia  *ParliaConfig  `json:"parlia,omitempty" toml:",omitempty"`
+	Bor     *BorConfig     `json:"bor,omitempty"`
+	Thunder *ThunderConfig `json:"thunder,omitempty"`
 }
 
 func (c *Config) String() string {
@@ -656,6 +657,75 @@ func sortMapKeys(m map[string]uint64) []string {
 	sort.Strings(keys)
 
 	return keys
+}
+
+// hardfork config for demo
+type ThunderConfig struct {
+	PalaBlock                      *big.Int `json:"pala_block"`
+	VerifyBidSession               uint32   `json:"verify_bid_session"`
+	ElectionStopBlockSessionOffset int64    `json:"election_stop_block_session_offset"`
+	ProposerListName               string   `json:"proposer_list_name"`
+	MaxCodeSize                    int64    `json:"max_code_size"`
+	RewardScheme                   string   `json:"reward_scheme"`
+	VaultGasUnlimited              bool     `json:"vault_gas_unlimited"`
+	GasTable                       string   `json:"gas_table"`
+	EVMHardforkVersion             string   `json:"evm_hardfork_version"`
+	IsConsensusInfoInHeader        bool     `json:"is_consensus_info_in_header"`
+	RNGVersion                     string   `json:"rng_version"`
+	BaseFee                        *big.Int `json:"base_fee"`
+	TokenInflation                 *big.Int `json:"token_inflation"`
+	CommitteeRewardRatio           int64    `json:"committee_reward_ratio"`
+	TPCRevertDelegateCall          bool     `json:"tpc_revert_delegate_call"`
+}
+
+func (c *ThunderConfig) String() string {
+	return "thunder"
+}
+
+func (c *ThunderConfig) IsPala(num uint64) bool {
+	return isForked(c.PalaBlock, num)
+}
+
+func (c *ThunderConfig) ShouldVerifyBid(session uint32) bool {
+	return c.VerifyBidSession <= session
+}
+
+func (c *ThunderConfig) IsPala2P5GasTable(session uint32) bool {
+	return c.GasTable == "pala-r2.1"
+}
+
+func (c *ThunderConfig) IsConstantinople(session uint32) bool {
+	return c.EVMHardforkVersion != "" &&
+		(c.EVMHardforkVersion == "constantinople" ||
+			c.EVMHardforkVersion == "petersburg" ||
+			c.EVMHardforkVersion == "istanbul" ||
+			c.EVMHardforkVersion == "berlin" ||
+			c.EVMHardforkVersion == "london")
+}
+
+func (c *ThunderConfig) IsPetersburg(session uint32) bool {
+	return c.EVMHardforkVersion != "" &&
+		(c.EVMHardforkVersion == "petersburg" ||
+			c.EVMHardforkVersion == "istanbul" ||
+			c.EVMHardforkVersion == "berlin" ||
+			c.EVMHardforkVersion == "london")
+}
+
+func (c *ThunderConfig) IsIstanbul(session uint32) bool {
+	return c.EVMHardforkVersion != "" &&
+		(c.EVMHardforkVersion == "istanbul" ||
+			c.EVMHardforkVersion == "berlin" ||
+			c.EVMHardforkVersion == "london")
+}
+
+func (c *ThunderConfig) IsBerlin(session uint32) bool {
+	return c.EVMHardforkVersion != "" &&
+		(c.EVMHardforkVersion == "berlin" ||
+			c.EVMHardforkVersion == "london")
+}
+
+func (c *ThunderConfig) IsLondon(session uint32) bool {
+	return c.EVMHardforkVersion != "" && c.EVMHardforkVersion == "london"
 }
 
 // Rules is syntactic sugar over Config. It can be used for functions
