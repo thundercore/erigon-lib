@@ -440,6 +440,8 @@ const (
 	LightClient = "LightClient"
 	// Period (one every 27 hours) => LightClientUpdate
 	LightClientUpdates = "LightClientUpdates"
+
+	TTConsensusInfo = "ThunderCoreConsensus"
 )
 
 // Keys
@@ -471,6 +473,8 @@ var (
 	LightClientStore            = []byte("LightClientStore")
 	LightClientFinalityUpdate   = []byte("LightClientFinalityUpdate")
 	LightClientOptimisticUpdate = []byte("LightClientOptimisticUpdate")
+
+	TTSessionStopBlock = []byte("TTSessionStopBlock")
 )
 
 // ChaindataTables - list of all buckets. App will panic if some bucket is not in this list.
@@ -591,6 +595,9 @@ var ChaindataTables = []string{
 	Attestetations,
 	LightClient,
 	LightClientUpdates,
+
+	// ThunderCore stuff
+	TTConsensusInfo,
 }
 
 const (
