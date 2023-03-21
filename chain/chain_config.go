@@ -23,6 +23,7 @@ import (
 	"strconv"
 
 	"github.com/ledgerwatch/erigon-lib/common"
+	"github.com/ledgerwatch/erigon-lib/thunder/hardfork"
 )
 
 // Config is the core config which determines the blockchain settings.
@@ -661,21 +662,22 @@ func sortMapKeys(m map[string]uint64) []string {
 
 // hardfork config for demo
 type ThunderConfig struct {
-	PalaBlock                      *big.Int `json:"pala_block"`
-	VerifyBidSession               uint32   `json:"verify_bid_session"`
-	ElectionStopBlockSessionOffset int64    `json:"election_stop_block_session_offset"`
-	ProposerListName               string   `json:"proposer_list_name"`
-	MaxCodeSize                    int64    `json:"max_code_size"`
-	RewardScheme                   string   `json:"reward_scheme"`
-	VaultGasUnlimited              bool     `json:"vault_gas_unlimited"`
-	GasTable                       string   `json:"gas_table"`
-	EVMHardforkVersion             string   `json:"evm_hardfork_version"`
-	IsConsensusInfoInHeader        bool     `json:"is_consensus_info_in_header"`
-	RNGVersion                     string   `json:"rng_version"`
-	BaseFee                        *big.Int `json:"base_fee"`
-	TokenInflation                 *big.Int `json:"token_inflation"`
-	CommitteeRewardRatio           int64    `json:"committee_reward_ratio"`
-	TPCRevertDelegateCall          bool     `json:"tpc_revert_delegate_call"`
+	Hardforks                      *hardfork.Hardforks            `json:"-"`
+	PalaBlock                      *big.Int                       `json:"-"`
+	VerifyBidSession               uint32                         `json:"-"`
+	ElectionStopBlockSessionOffset *hardfork.Int64HardforkConfig  `json:"-"`
+	ProposerListName               *hardfork.StringHardforkConfig `json:"-"`
+	MaxCodeSize                    *hardfork.Int64HardforkConfig  `json:"-"`
+	RewardScheme                   *hardfork.StringHardforkConfig `json:"-"`
+	VaultGasUnlimited              *hardfork.BoolHardforkConfig   `json:"-"`
+	GasTable                       *hardfork.StringHardforkConfig `json:"-"`
+	EVMHardforkVersion             *hardfork.StringHardforkConfig `json:"-"`
+	IsConsensusInfoInHeader        *hardfork.BoolHardforkConfig   `json:"-"`
+	RNGVersion                     *hardfork.StringHardforkConfig `json:"-"`
+	BaseFee                        *hardfork.BigIntHardforkConfig `json:"-"`
+	TokenInflation                 *hardfork.BigIntHardforkConfig `json:"-"`
+	CommitteeRewardRatio           *hardfork.Int64HardforkConfig  `json:"-"`
+	TPCRevertDelegateCall          *hardfork.BoolHardforkConfig   `json:"-"`
 }
 
 func (c *ThunderConfig) String() string {
@@ -691,41 +693,41 @@ func (c *ThunderConfig) ShouldVerifyBid(session uint32) bool {
 }
 
 func (c *ThunderConfig) IsPala2P5GasTable(session uint32) bool {
-	return c.GasTable == "pala-r2.1"
+	return c.GasTable.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "pala-r2.1"
 }
 
 func (c *ThunderConfig) IsConstantinople(session uint32) bool {
-	return c.EVMHardforkVersion != "" &&
-		(c.EVMHardforkVersion == "constantinople" ||
-			c.EVMHardforkVersion == "petersburg" ||
-			c.EVMHardforkVersion == "istanbul" ||
-			c.EVMHardforkVersion == "berlin" ||
-			c.EVMHardforkVersion == "london")
+	return c.EVMHardforkVersion != nil &&
+		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "constantinople" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "petersburg" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "istanbul" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "berlin" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
 func (c *ThunderConfig) IsPetersburg(session uint32) bool {
-	return c.EVMHardforkVersion != "" &&
-		(c.EVMHardforkVersion == "petersburg" ||
-			c.EVMHardforkVersion == "istanbul" ||
-			c.EVMHardforkVersion == "berlin" ||
-			c.EVMHardforkVersion == "london")
+	return c.EVMHardforkVersion != nil &&
+		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "petersburg" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "istanbul" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "berlin" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
 func (c *ThunderConfig) IsIstanbul(session uint32) bool {
-	return c.EVMHardforkVersion != "" &&
-		(c.EVMHardforkVersion == "istanbul" ||
-			c.EVMHardforkVersion == "berlin" ||
-			c.EVMHardforkVersion == "london")
+	return c.EVMHardforkVersion != nil &&
+		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "istanbul" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "berlin" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
 func (c *ThunderConfig) IsBerlin(session uint32) bool {
-	return c.EVMHardforkVersion != "" &&
-		(c.EVMHardforkVersion == "berlin" ||
-			c.EVMHardforkVersion == "london")
+	return c.EVMHardforkVersion != nil &&
+		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "berlin" ||
+			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
 func (c *ThunderConfig) IsLondon(session uint32) bool {
-	return c.EVMHardforkVersion != "" && c.EVMHardforkVersion == "london"
+	return c.EVMHardforkVersion != nil && c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london"
 }
 
 // Rules is syntactic sugar over Config. It can be used for functions
