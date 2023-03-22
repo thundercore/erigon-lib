@@ -744,10 +744,11 @@ type Rules struct {
 	IsNano, IsMoran, IsGibbs                                bool
 	IsEip1559FeeCollector                                   bool
 	IsParlia, IsAura                                        bool
+	IsThunder                                               bool
 }
 
 // Rules ensures c's ChainID is not nil and returns a new Rules instance
-func (c *Config) Rules(num uint64, time uint64) *Rules {
+func (c *Config) Rules(num uint64, time uint64, session uint32) *Rules {
 	chainID := c.ChainID
 	if chainID == nil {
 		chainID = new(big.Int)
@@ -759,11 +760,11 @@ func (c *Config) Rules(num uint64, time uint64) *Rules {
 		IsTangerineWhistle:    c.IsTangerineWhistle(num),
 		IsSpuriousDragon:      c.IsSpuriousDragon(num),
 		IsByzantium:           c.IsByzantium(num),
-		IsConstantinople:      c.IsConstantinople(num),
-		IsPetersburg:          c.IsPetersburg(num),
-		IsIstanbul:            c.IsIstanbul(num),
-		IsBerlin:              c.IsBerlin(num),
-		IsLondon:              c.IsLondon(num),
+		IsConstantinople:      c.IsConstantinople(num) || (c.Thunder != nil && c.Thunder.IsConstantinople(session)),
+		IsPetersburg:          c.IsPetersburg(num) || (c.Thunder != nil && c.Thunder.IsPetersburg(session)),
+		IsIstanbul:            c.IsIstanbul(num) || (c.Thunder != nil && c.Thunder.IsIstanbul(session)),
+		IsBerlin:              c.IsBerlin(num) || (c.Thunder != nil && c.Thunder.IsBerlin(session)),
+		IsLondon:              c.IsLondon(num) || (c.Thunder != nil && c.Thunder.IsLondon(session)),
 		IsShanghai:            c.IsShanghai(time),
 		IsCancun:              c.IsCancun(time),
 		IsSharding:            c.IsSharding(time),
@@ -773,6 +774,7 @@ func (c *Config) Rules(num uint64, time uint64) *Rules {
 		IsEip1559FeeCollector: c.IsEip1559FeeCollector(num),
 		IsParlia:              c.Parlia != nil,
 		IsAura:                c.Aura != nil,
+		IsThunder:             c.Thunder != nil,
 	}
 }
 
