@@ -23,6 +23,7 @@ import (
 	"strconv"
 
 	"github.com/ledgerwatch/erigon-lib/common"
+	"github.com/ledgerwatch/erigon-lib/thunder/config"
 	"github.com/ledgerwatch/erigon-lib/thunder/hardfork"
 )
 
@@ -663,6 +664,7 @@ func sortMapKeys(m map[string]uint64) []string {
 // hardfork config for demo
 type ThunderConfig struct {
 	Hardforks                      *hardfork.Hardforks            `json:"-"`
+	Common                         *config.Config                 `json:"-"`
 	PalaBlock                      *big.Int                       `json:"-"`
 	VerifyBidSession               uint32                         `json:"-"`
 	ElectionStopBlockSessionOffset *hardfork.Int64HardforkConfig  `json:"-"`
