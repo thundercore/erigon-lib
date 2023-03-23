@@ -96,6 +96,26 @@ func (c *BoolHardforkConfig) GetValueHardforkAtSession(hardforks *Hardforks, ses
 	return false
 }
 
+func (c *BoolHardforkConfig) GetEnabledBlockNum(h *Hardforks) int64 {
+	for _, blockHardfork := range h.BlockHardforks[c.name] {
+		if blockHardfork.Value.(bool) {
+			return blockHardfork.BlockNum
+		}
+	}
+
+	return -1
+}
+
+func (c *BoolHardforkConfig) GetEnabledSessionNum(h *Hardforks) int64 {
+	for _, sessionHardfork := range h.SessionHardforks[c.name] {
+		if sessionHardfork.Value.(bool) {
+			return sessionHardfork.SessionNum
+		}
+	}
+
+	return -1
+}
+
 type StringHardforkConfig struct {
 	HardforkConfig
 }
