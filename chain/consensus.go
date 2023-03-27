@@ -3,10 +3,10 @@ package chain
 type ConsensusName string
 
 const (
-	AuRaConsensus    ConsensusName = "aura"
-	EtHashConsensus  ConsensusName = "ethash"
-	CliqueConsensus  ConsensusName = "clique"
-	ParliaConsensus  ConsensusName = "parlia"
-	BorConsensus     ConsensusName = "bor"
-	ThunderConsensus ConsensusName = "thunder"
+	AuRaConsensus   ConsensusName = "aura"
+	EtHashConsensus ConsensusName = "ethash"
+	CliqueConsensus ConsensusName = "clique"
+	ParliaConsensus ConsensusName = "parlia"
+	BorConsensus    ConsensusName = "bor"
+	PalaConsensus   ConsensusName = "pala"
 )

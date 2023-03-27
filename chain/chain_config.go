@@ -86,12 +86,12 @@ type Config struct {
 	Eip1559FeeCollectorTransition *big.Int        `json:"eip1559FeeCollectorTransition,omitempty"` // (Optional) Block from which burnt EIP-1559 fees go to the Eip1559FeeCollector
 
 	// Various consensus engines
-	Ethash  *EthashConfig  `json:"ethash,omitempty"`
-	Clique  *CliqueConfig  `json:"clique,omitempty"`
-	Aura    *AuRaConfig    `json:"aura,omitempty"`
-	Parlia  *ParliaConfig  `json:"parlia,omitempty" toml:",omitempty"`
-	Bor     *BorConfig     `json:"bor,omitempty"`
-	Thunder *ThunderConfig `json:"thunder,omitempty"`
+	Ethash *EthashConfig `json:"ethash,omitempty"`
+	Clique *CliqueConfig `json:"clique,omitempty"`
+	Aura   *AuRaConfig   `json:"aura,omitempty"`
+	Parlia *ParliaConfig `json:"parlia,omitempty" toml:",omitempty"`
+	Bor    *BorConfig    `json:"bor,omitempty"`
+	Pala   *PalaConfig   `json:"thunder,omitempty"`
 }
 
 func (c *Config) String() string {
@@ -662,7 +662,7 @@ func sortMapKeys(m map[string]uint64) []string {
 }
 
 // hardfork config for demo
-type ThunderConfig struct {
+type PalaConfig struct {
 	Hardforks                      *hardfork.Hardforks            `json:"-"`
 	Common                         *config.Config                 `json:"-"`
 	PalaBlock                      *big.Int                       `json:"-"`
@@ -682,23 +682,23 @@ type ThunderConfig struct {
 	TPCRevertDelegateCall          *hardfork.BoolHardforkConfig   `json:"-"`
 }
 
-func (c *ThunderConfig) String() string {
+func (c *PalaConfig) String() string {
 	return "thunder"
 }
 
-func (c *ThunderConfig) IsPala(num uint64) bool {
+func (c *PalaConfig) IsPala(num uint64) bool {
 	return isForked(c.PalaBlock, num)
 }
 
-func (c *ThunderConfig) ShouldVerifyBid(session uint32) bool {
+func (c *PalaConfig) ShouldVerifyBid(session uint32) bool {
 	return c.VerifyBidSession <= session
 }
 
-func (c *ThunderConfig) IsPala2P5GasTable(session uint32) bool {
+func (c *PalaConfig) IsPala2P5GasTable(session uint32) bool {
 	return c.GasTable.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "pala-r2.1"
 }
 
-func (c *ThunderConfig) IsConstantinople(session uint32) bool {
+func (c *PalaConfig) IsConstantinople(session uint32) bool {
 	return c.EVMHardforkVersion != nil &&
 		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "constantinople" ||
 			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "petersburg" ||
@@ -707,7 +707,7 @@ func (c *ThunderConfig) IsConstantinople(session uint32) bool {
 			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
-func (c *ThunderConfig) IsPetersburg(session uint32) bool {
+func (c *PalaConfig) IsPetersburg(session uint32) bool {
 	return c.EVMHardforkVersion != nil &&
 		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "petersburg" ||
 			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "istanbul" ||
@@ -715,20 +715,20 @@ func (c *ThunderConfig) IsPetersburg(session uint32) bool {
 			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
-func (c *ThunderConfig) IsIstanbul(session uint32) bool {
+func (c *PalaConfig) IsIstanbul(session uint32) bool {
 	return c.EVMHardforkVersion != nil &&
 		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "istanbul" ||
 			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "berlin" ||
 			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
-func (c *ThunderConfig) IsBerlin(session uint32) bool {
+func (c *PalaConfig) IsBerlin(session uint32) bool {
 	return c.EVMHardforkVersion != nil &&
 		(c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "berlin" ||
 			c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london")
 }
 
-func (c *ThunderConfig) IsLondon(session uint32) bool {
+func (c *PalaConfig) IsLondon(session uint32) bool {
 	return c.EVMHardforkVersion != nil && c.EVMHardforkVersion.GetValueHardforkAtSession(c.Hardforks, int64(session)) == "london"
 }
 
@@ -762,11 +762,11 @@ func (c *Config) Rules(num uint64, time uint64, session uint32) *Rules {
 		IsTangerineWhistle:    c.IsTangerineWhistle(num),
 		IsSpuriousDragon:      c.IsSpuriousDragon(num),
 		IsByzantium:           c.IsByzantium(num),
-		IsConstantinople:      c.IsConstantinople(num) || (c.Thunder != nil && c.Thunder.IsConstantinople(session)),
-		IsPetersburg:          c.IsPetersburg(num) || (c.Thunder != nil && c.Thunder.IsPetersburg(session)),
-		IsIstanbul:            c.IsIstanbul(num) || (c.Thunder != nil && c.Thunder.IsIstanbul(session)),
-		IsBerlin:              c.IsBerlin(num) || (c.Thunder != nil && c.Thunder.IsBerlin(session)),
-		IsLondon:              c.IsLondon(num) || (c.Thunder != nil && c.Thunder.IsLondon(session)),
+		IsConstantinople:      c.IsConstantinople(num) || (c.Pala != nil && c.Pala.IsConstantinople(session)),
+		IsPetersburg:          c.IsPetersburg(num) || (c.Pala != nil && c.Pala.IsPetersburg(session)),
+		IsIstanbul:            c.IsIstanbul(num) || (c.Pala != nil && c.Pala.IsIstanbul(session)),
+		IsBerlin:              c.IsBerlin(num) || (c.Pala != nil && c.Pala.IsBerlin(session)),
+		IsLondon:              c.IsLondon(num) || (c.Pala != nil && c.Pala.IsLondon(session)),
 		IsShanghai:            c.IsShanghai(time),
 		IsCancun:              c.IsCancun(time),
 		IsSharding:            c.IsSharding(time),
@@ -776,7 +776,7 @@ func (c *Config) Rules(num uint64, time uint64, session uint32) *Rules {
 		IsEip1559FeeCollector: c.IsEip1559FeeCollector(num),
 		IsParlia:              c.Parlia != nil,
 		IsAura:                c.Aura != nil,
-		IsThunder:             c.Thunder != nil,
+		IsThunder:             c.Pala != nil,
 	}
 }
 
