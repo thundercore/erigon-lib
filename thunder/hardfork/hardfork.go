@@ -23,7 +23,7 @@ func (h *Hardforks) GetValueHardforkAtBlock(name string, blockNum int64) (interf
 	}
 
 	lower := sort.Search(length, func(i int) bool {
-		return h.BlockHardforks[name][i].BlockNum >= blockNum
+		return h.BlockHardforks[name][i].BlockNum > blockNum
 	})
 
 	return h.BlockHardforks[name][lower-1].Value, true
@@ -36,7 +36,7 @@ func (h *Hardforks) GetValueHardforkAtSession(name string, sessionNum int64) (in
 	}
 
 	lower := sort.Search(length, func(i int) bool {
-		return h.SessionHardforks[name][i].SessionNum >= sessionNum
+		return h.SessionHardforks[name][i].SessionNum > sessionNum
 	})
 
 	return h.SessionHardforks[name][lower-1].Value, true
