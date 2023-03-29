@@ -8,10 +8,16 @@ import (
 
 type Key struct {
 	GenesisCommPath string `toml:"GenesisCommPath" yaml:"GenesisCommPath"`
+	AlterCommPath   string `toml:"alterCommPath" yaml:"alterCommPath"`
+}
+
+type Pala struct {
+	FromGenesis bool `toml:"fromGenesis" yaml:"fromGenesis"`
 }
 
 type Config struct {
-	Key Key `toml:"key" yaml:"key"`
+	Key  Key  `toml:"key" yaml:"key"`
+	Pala Pala `toml:"pala" yaml:"pala"`
 }
 
 func New(path string) (*Config, error) {
