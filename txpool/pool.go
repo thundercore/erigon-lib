@@ -85,6 +85,8 @@ type Config struct {
 	AccountSlots          uint64 // Number of executable transaction slots guaranteed per account
 	PriceBump             uint64 // Price bump percentage to replace an already existing transaction
 	OverrideShanghaiTime  *big.Int
+
+	LifeTime time.Duration
 }
 
 var DefaultConfig = Config{
@@ -101,6 +103,8 @@ var DefaultConfig = Config{
 	AccountSlots:         16, //TODO: to choose right value (16 to be compatible with Geth)
 	PriceBump:            10, // Price bump percentage to replace an already existing transaction
 	OverrideShanghaiTime: nil,
+
+	LifeTime: 1 * time.Hour,
 }
 
 // Pool is interface for the transaction pool
@@ -170,6 +174,7 @@ const (
 	NotReplaced         DiscardReason = 20 // There was an existing transaction with the same sender and nonce, not enough price bump to replace
 	DuplicateHash       DiscardReason = 21 // There was an existing transaction with the same hash
 	InitCodeTooLarge    DiscardReason = 22 // EIP-3860 - transaction init code is too large
+	ExceedLifetime      DiscardReason = 23
 )
 
 func (r DiscardReason) String() string {
@@ -1443,6 +1448,8 @@ func MainLoop(ctx context.Context, db kv.RwDB, coreDB kv.RoDB, p *TxPool, newTxs
 	defer commitEvery.Stop()
 	logEvery := time.NewTicker(p.cfg.LogEvery)
 	defer logEvery.Stop()
+	evictEvery := time.NewTicker(p.cfg.LifeTime)
+	defer evictEvery.Stop()
 
 	for {
 		select {
@@ -1561,6 +1568,41 @@ func MainLoop(ctx context.Context, db kv.RwDB, coreDB kv.RoDB, p *TxPool, newTxs
 			types, sizes, hashes = p.AppendAllAnnouncements(types, sizes, hashes[:0])
 			go send.PropagatePooledTxsToPeersList(newPeers, types, sizes, hashes)
 			propagateToNewPeerTimer.UpdateDuration(t)
+		case <-evictEvery.C:
+			go func() {
+				p.lock.Lock()
+				defer p.lock.Unlock()
+
+				discarded := []*metaTx{}
+
+				p.all.ascendAll(func(tx *metaTx) bool {
+					ts := time.Now().Unix()
+
+					// no need to discard txs from local pool
+					if tx.timestamp+uint64(p.cfg.LifeTime) > uint64(ts) {
+						return true
+					}
+
+					// remove tx due to lifetime
+					switch tx.currentSubPool {
+					case PendingSubPool:
+						p.pending.Remove(tx)
+					case BaseFeeSubPool:
+						p.baseFee.Remove(tx)
+					case QueuedSubPool:
+						return true
+					default:
+					}
+
+					discarded = append(discarded, tx)
+
+					return true
+				})
+
+				for _, tx := range discarded {
+					p.discardLocked(tx, ExceedLifetime)
+				}
+			}()
 		}
 	}
 }
