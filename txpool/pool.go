@@ -243,10 +243,11 @@ type metaTx struct {
 	subPool                   SubPoolMarker
 	currentSubPool            SubPoolType
 	alreadyYielded            bool
+	wallTime                  time.Time
 }
 
 func newMetaTx(slot *types.TxSlot, isLocal bool, timestmap uint64) *metaTx {
-	mt := &metaTx{Tx: slot, worstIndex: -1, bestIndex: -1, timestamp: timestmap}
+	mt := &metaTx{Tx: slot, worstIndex: -1, bestIndex: -1, timestamp: timestmap, wallTime: time.Now()}
 	if isLocal {
 		mt.subPool = IsLocal
 	}
@@ -1576,10 +1577,9 @@ func MainLoop(ctx context.Context, db kv.RwDB, coreDB kv.RoDB, p *TxPool, newTxs
 				discarded := []*metaTx{}
 
 				p.all.ascendAll(func(tx *metaTx) bool {
-					ts := time.Now().Unix()
 
 					// no need to discard txs from local pool
-					if tx.timestamp+uint64(p.cfg.LifeTime) > uint64(ts) {
+					if time.Since(tx.wallTime) < p.cfg.LifeTime {
 						return true
 					}
 
@@ -1601,6 +1601,7 @@ func MainLoop(ctx context.Context, db kv.RwDB, coreDB kv.RoDB, p *TxPool, newTxs
 
 				for _, tx := range discarded {
 					p.discardLocked(tx, ExceedLifetime)
+					log.Warn("[TxPool] Evict", "sender_id", tx.Tx.SenderID, "nonce", tx.Tx.Nonce, "tip", tx.Tx.Tip, "value", tx.Tx.Value.Uint64())
 				}
 			}()
 		}
