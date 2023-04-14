@@ -749,6 +749,12 @@ func (p *TxPool) validateTx(txn *types.TxSlot, isLocal bool, stateCache kvcache.
 		}
 		return UnderPriced
 	}
+
+	if txn.Tip.Cmp(uint256.NewInt(p.pendingBaseFee.Load())) == -1 {
+		log.Info("gas price lower than base fee")
+		return FeeTooLow
+	}
+
 	gas, reason := CalcIntrinsicGas(uint64(txn.DataLen), uint64(txn.DataNonZeroLen), nil, txn.Creation, true, true, isShanghai)
 	if txn.Traced {
 		log.Info(fmt.Sprintf("TX TRACING: validateTx intrinsic gas idHash=%x gas=%d", txn.IDHash, gas))
