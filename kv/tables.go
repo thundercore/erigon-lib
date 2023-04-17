@@ -475,6 +475,7 @@ var (
 	LightClientOptimisticUpdate = []byte("LightClientOptimisticUpdate")
 
 	TTSessionStopBlock = []byte("TTSessionStopBlock")
+	TTBlock            = []byte("TTBlock")
 )
 
 // ChaindataTables - list of all buckets. App will panic if some bucket is not in this list.

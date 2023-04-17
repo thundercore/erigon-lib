@@ -680,6 +680,7 @@ type PalaConfig struct {
 	TokenInflation                 *hardfork.BigIntHardforkConfig `json:"-"`
 	CommitteeRewardRatio           *hardfork.Int64HardforkConfig  `json:"-"`
 	TPCRevertDelegateCall          *hardfork.BoolHardforkConfig   `json:"-"`
+	K                              *hardfork.Int64HardforkConfig  `json:"-"` // max unnotarized proposal
 }
 
 func (c *PalaConfig) String() string {
