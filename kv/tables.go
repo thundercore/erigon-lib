@@ -474,8 +474,14 @@ var (
 	LightClientFinalityUpdate   = []byte("LightClientFinalityUpdate")
 	LightClientOptimisticUpdate = []byte("LightClientOptimisticUpdate")
 
-	TTSessionStopBlock = []byte("TTSessionStopBlock")
-	TTBlock            = []byte("TTBlock")
+	TTSessionStopBlock      = []byte("TTSessionStopBlock")
+	TTBlock                 = []byte("TTBlock")
+	TTFreshestNotarizedHead = []byte("TTFreshestNota")
+	TTFinalizedSnKey        = []byte("TTFinalizedSn")
+	TTNotarization          = []byte("TTNota")
+	TTClockNotarization     = []byte("TTClockNota")
+	TTEpochStatus           = []byte("TTEpochStatus")
+	TTSchemaVersion         = []byte("TTSchemaVersion")
 )
 
 // ChaindataTables - list of all buckets. App will panic if some bucket is not in this list.
