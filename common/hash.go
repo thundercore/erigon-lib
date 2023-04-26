@@ -82,6 +82,10 @@ func (h Hash) String() string {
 	return h.Hex()
 }
 
+func (h Hash) Str() string {
+	return string(h[:])
+}
+
 // Format implements fmt.Formatter.
 // Hash supports the %v, %s, %v, %x, %X and %d format verbs.
 func (h Hash) Format(s fmt.State, c rune) {
