@@ -53,8 +53,6 @@ var ProtoIds = map[uint]map[sentry.MessageId]struct{}{
 		sentry.MessageId_NEW_POOLED_TRANSACTION_HASHES_65: struct{}{},
 		sentry.MessageId_GET_POOLED_TRANSACTIONS_65:       struct{}{},
 		sentry.MessageId_POOLED_TRANSACTIONS_65:           struct{}{},
-		sentry.MessageId_TT_NOTARIZATION:                  struct{}{},
-		sentry.MessageId_GET_TT_NOTARIZATION:              struct{}{},
 	},
 	ETH66: {
 		sentry.MessageId_GET_BLOCK_HEADERS_66:             struct{}{},
@@ -71,8 +69,6 @@ var ProtoIds = map[uint]map[sentry.MessageId]struct{}{
 		sentry.MessageId_NEW_POOLED_TRANSACTION_HASHES_66: struct{}{},
 		sentry.MessageId_GET_POOLED_TRANSACTIONS_66:       struct{}{},
 		sentry.MessageId_POOLED_TRANSACTIONS_66:           struct{}{},
-		sentry.MessageId_TT_NOTARIZATION:                  struct{}{},
-		sentry.MessageId_GET_TT_NOTARIZATION:              struct{}{},
 	},
 	ETH67: {
 		sentry.MessageId_GET_BLOCK_HEADERS_66:             struct{}{},
@@ -87,8 +83,6 @@ var ProtoIds = map[uint]map[sentry.MessageId]struct{}{
 		sentry.MessageId_NEW_POOLED_TRANSACTION_HASHES_66: struct{}{},
 		sentry.MessageId_GET_POOLED_TRANSACTIONS_66:       struct{}{},
 		sentry.MessageId_POOLED_TRANSACTIONS_66:           struct{}{},
-		sentry.MessageId_TT_NOTARIZATION:                  struct{}{},
-		sentry.MessageId_GET_TT_NOTARIZATION:              struct{}{},
 	},
 	ETH68: {
 		sentry.MessageId_GET_BLOCK_HEADERS_66:             struct{}{},
@@ -103,8 +97,6 @@ var ProtoIds = map[uint]map[sentry.MessageId]struct{}{
 		sentry.MessageId_NEW_POOLED_TRANSACTION_HASHES_68: struct{}{},
 		sentry.MessageId_GET_POOLED_TRANSACTIONS_66:       struct{}{},
 		sentry.MessageId_POOLED_TRANSACTIONS_66:           struct{}{},
-		sentry.MessageId_TT_NOTARIZATION:                  struct{}{},
-		sentry.MessageId_GET_TT_NOTARIZATION:              struct{}{},
 	},
 }
 
