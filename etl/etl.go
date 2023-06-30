@@ -73,9 +73,10 @@ type TransformArgs struct {
 	BufferSize      int
 }
 
-func Transform(
+func TransformBetween(
 	logPrefix string,
-	db kv.RwTx,
+	from kv.Tx,
+	to kv.RwTx,
 	fromBucket string,
 	toBucket string,
 	tmpdir string,
@@ -92,7 +93,7 @@ func Transform(
 	defer collector.Close()
 
 	t := time.Now()
-	if err := extractBucketIntoFiles(logPrefix, db, fromBucket, args.ExtractStartKey, args.ExtractEndKey, collector, extractFunc, args.Quit, args.LogDetailsExtract); err != nil {
+	if err := extractBucketIntoFiles(logPrefix, from, fromBucket, args.ExtractStartKey, args.ExtractEndKey, collector, extractFunc, args.Quit, args.LogDetailsExtract); err != nil {
 		return err
 	}
 	log.Trace(fmt.Sprintf("[%s] Extraction finished", logPrefix), "took", time.Since(t))
@@ -100,7 +101,20 @@ func Transform(
 	defer func(t time.Time) {
 		log.Trace(fmt.Sprintf("[%s] Load finished", logPrefix), "took", time.Since(t))
 	}(time.Now())
-	return collector.Load(db, toBucket, loadFunc, args)
+	return collector.Load(to, toBucket, loadFunc, args)
+}
+
+func Transform(
+	logPrefix string,
+	db kv.RwTx,
+	fromBucket string,
+	toBucket string,
+	tmpdir string,
+	extractFunc ExtractFunc,
+	loadFunc LoadFunc,
+	args TransformArgs,
+) error {
+	return TransformBetween(logPrefix, db, db, fromBucket, toBucket, tmpdir, extractFunc, loadFunc, args)
 }
 
 // extractBucketIntoFiles - [startkey, endkey)
