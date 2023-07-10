@@ -482,6 +482,7 @@ var (
 	TTClockNotarization     = []byte("TTClockNota")
 	TTEpochStatus           = []byte("TTEpochStatus")
 	TTSchemaVersion         = []byte("TTSchemaVersion")
+	TTStateRootKey          = []byte("TTStateRootKey")
 )
 
 // ChaindataTables - list of all buckets. App will panic if some bucket is not in this list.
